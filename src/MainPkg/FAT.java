@@ -33,7 +33,7 @@ class FATC {
 public class FAT {
     private byte[] FatIMG;
 
-    FAT(byte[] image) throws IOException {
+    FAT(byte[] image) {
         FatIMG = image;
         readStructure();
     }
@@ -52,13 +52,6 @@ public class FAT {
         FATC.FATableStartSector = FATC.BPB_RsvdSecCnt;
         FATC.RootStartSector = FATC.FATableStartSector + FATC.BPB_NumFATs * FATC.BPB_FATSz16;
         FATC.DataStartSector = FATC.RootStartSector + ((FATC.BPB_RootEntCnt * 0x20) / FATC.BPB_BytsPerSec);
-    }
-
-    //copy the first FAT table into the second FAT table
-    public void cleanup() {
-        int RootStartAddr = FATC.RootStartSector * FATC.BPB_BytsPerSec;
-        int FATSzBytes = FATC.BPB_FATSz16 * FATC.BPB_BytsPerSec;
-        System.arraycopy(FatIMG, RootStartAddr, FatIMG, (RootStartAddr + FATSzBytes), FATSzBytes);
     }
 
     private void setFATableEntry(int FATentry, int value) {
@@ -101,6 +94,7 @@ public class FAT {
 
     //Notice how it has "single" in the title
     //it means that you can't call this method after you've called it once, it just won't work
+    //if you want, you can clear root first and *then* call this method
     public void copySingleFileToRoot(String filename, byte[] filedata) {
         int RootStartAddr = FATC.RootStartSector * FATC.BPB_BytsPerSec;
         int DataStartAddr = FATC.DataStartSector * FATC.BPB_BytsPerSec;
@@ -124,12 +118,19 @@ public class FAT {
 
         //Copy the actual data of the file into the data region
         System.arraycopy(filedata, 0, FatIMG, DataStartAddr, filedata.length);
-
         //And now put incrementing clusters pointing to each successive cluster of our file
         int File_NumOfClusters = filedata.length / (FATC.BPB_SecPerClus * FATC.BPB_BytsPerSec);
         File_NumOfClusters += (filedata.length % (FATC.BPB_SecPerClus * FATC.BPB_BytsPerSec) == 0) ? 0 : 1; //If it doesn't fit entirely in one cluster, you need to add another extra cluster
-        for (int i = 0; i < File_NumOfClusters; i++)
+        for (int i = 0; i < File_NumOfClusters; i++) {
             setFATableEntry(2 + i, 2 + 1 + i);
+        }
         setFATableEntry(2 + File_NumOfClusters - 1, 0xFFF); //Set the final entry to 0xFFF to signal the end of a file
+    }
+
+    //copy the first FAT table into the second FAT table
+    public void copyFATable() {
+        int RootStartAddr = FATC.RootStartSector * FATC.BPB_BytsPerSec;
+        int FATSzBytes = FATC.BPB_FATSz16 * FATC.BPB_BytsPerSec;
+        System.arraycopy(FatIMG, RootStartAddr, FatIMG, (RootStartAddr + FATSzBytes), FATSzBytes);
     }
 }

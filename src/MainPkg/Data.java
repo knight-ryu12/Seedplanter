@@ -7,10 +7,15 @@ import java.nio.file.Paths;
 import java.util.zip.ZipFile;
 
 public class Data{
-    ZipRegion ZIPR;
-    byte[][] injectiondata = new byte[4][];
-    byte[]   movableSed = new byte[16];
-    byte[]   DSiWareBin;
+    private ZipRegion ZIPR;
+    private byte[][] injectiondata = new byte[4][]; //app, savedata/payload, all, backup
+    private byte[]   movableSed = new byte[16];
+    private byte[]   DSiWareBin;
+
+    public ZipRegion returnZipRegion()          { return ZIPR; }
+    public byte[]    returnInjectionData(int x) { return injectiondata[x]; }
+    public byte[]    returnMovableSed()         { return movableSed; }
+    public byte[]    returnDSiWareBin()         { return DSiWareBin; }
 
     Data(String DSiWareStr, String movableSedStr, String injectionZipStr) throws IOException {
         ZipFile zf = null;
@@ -21,12 +26,12 @@ public class Data{
                 throw new IOException("ZIP Region Error");
 
             if (ZIPR == ZipRegion.ZIP_EUR || ZIPR == ZipRegion.ZIP_USA)
-                readFilesEURUSA(zf, injectiondata[0], injectiondata[1]);
+                readFilesEURUSA(zf);
             else if (ZIPR == ZipRegion.ZIP_JPN)
-                readFilesJPN(zf, injectiondata[0], injectiondata[1], injectiondata[2], injectiondata[3]);
+                readFilesJPN(zf);
 
-            readMovableSed(movableSedStr, movableSed);
-            readDSiWare(DSiWareStr, DSiWareBin);
+            readMovableSed(movableSedStr);
+            readDSiWare(DSiWareStr);
         } catch (IOException e) {
             throw e;
         } finally {
@@ -34,23 +39,23 @@ public class Data{
         }
     }
 
-    private void readFilesEURUSA(ZipFile zf,  byte[] sudoku_v0, byte[] savedata) throws IOException {
-        sudoku_v0   = ZipHandling.ReadAllBytesFromZipEntry(zf, "sudoku_v0.app");
-        savedata    = ZipHandling.ReadAllBytesFromZipEntry(zf, "savedata/savedata.bin");
+    private void readFilesEURUSA(ZipFile zf) throws IOException {
+        injectiondata[0] = ZipHandling.ReadAllBytesFromZipEntry(zf, "sudoku_v0.app");
+        injectiondata[1] = ZipHandling.ReadAllBytesFromZipEntry(zf, "savedata/savedata.bin");
     }
 
-    private void readFilesJPN(ZipFile zf, byte[] fourswords, byte[] payload, byte[] all, byte[] backup) throws IOException {
-        fourswords  = ZipHandling.ReadAllBytesFromZipEntry(zf, "4swords.app");
-        payload     = ZipHandling.ReadAllBytesFromZipEntry(zf, "savedata/savedata/payload.dat");
-        all         = ZipHandling.ReadAllBytesFromZipEntry(zf, "savedata/savedata/all.dat");
-        backup      = ZipHandling.ReadAllBytesFromZipEntry(zf, "savedata/savedata/backup.dat");
+    private void readFilesJPN(ZipFile zf) throws IOException {
+        injectiondata[0]  = ZipHandling.ReadAllBytesFromZipEntry(zf, "4swords.app");
+        injectiondata[1]  = ZipHandling.ReadAllBytesFromZipEntry(zf, "savedata/savedata/payload.dat");
+        injectiondata[2]  = ZipHandling.ReadAllBytesFromZipEntry(zf, "savedata/savedata/all.dat");
+        injectiondata[3]  = ZipHandling.ReadAllBytesFromZipEntry(zf, "savedata/savedata/backup.dat");
     }
 
-    private void readMovableSed(String movableSedStr, byte[] movableSed) throws IOException {
+    private void readMovableSed(String movableSedStr) throws IOException {
         System.arraycopy(Files.readAllBytes(Paths.get(movableSedStr)), 0x110, movableSed, 0, 16);
     }
 
-    private void readDSiWare(String DSiWareStr, byte[] DSiWare) throws IOException {
-        DSiWare = Files.readAllBytes(Paths.get(DSiWareStr));
+    private void readDSiWare(String DSiWareStr) throws IOException {
+        DSiWareBin = Files.readAllBytes(Paths.get(DSiWareStr));
     }
 }

@@ -4,12 +4,13 @@ import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import java.io.IOException;
 
 public class Controller {
     @FXML private TextField dsiWare_TextField, movableSed_TextField, injectionZip_TextField, ctcert_TextField;
 
     // 0 is dsiWare, 1 is movableSed, 2 is injectionZip, 3 is ctcert
-    public static String[] TextFields_Strings = new String[4];
+    private static String[] TextFields_Strings = new String[4];
 
     @FXML private void dsiWare_UpdateTextField() { TextFields_Strings[0] = dsiWare_TextField.getText(); }
 
@@ -33,7 +34,7 @@ public class Controller {
 
     @FXML private void injectionZip_BrowseButton() {
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Select your zip injection file");
+        fileChooser.setTitle("Select your ZIP injection file");
         TextFields_Strings[2] = fileChooser.showOpenDialog(new Stage()).getAbsolutePath();
         injectionZip_TextField.setText(TextFields_Strings[2]);
     }
@@ -48,8 +49,14 @@ public class Controller {
     }
 
     @FXML private void injectButton() {
-        Seedinjector injector = new Seedinjector(TextFields_Strings[0], TextFields_Strings[1], TextFields_Strings[2], TextFields_Strings[3]);
+        TextFields_Strings[1] = "C:\\Users\\jason\\Desktop\\TADpole_jason\\resources\\movable.sed";
+        TextFields_Strings[3] = "C:\\Users\\jason\\Desktop\\ctcert\\angelsl\\ctcert.bin";
+        try {
+            Seedplanter planter = new Seedplanter(TextFields_Strings[0], TextFields_Strings[1], TextFields_Strings[2], TextFields_Strings[3]);
+            planter.DoInjection();
+            Main.showAlertBox("Done!", null, "Everything went well!");
+        } catch (IOException e) {
+            Main.showAlertBox("An exception occurred!", null, e.getMessage());
+        }
     }
-
-
 }
