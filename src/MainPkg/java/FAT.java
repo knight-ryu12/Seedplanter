@@ -1,8 +1,7 @@
-package MainPkg;
+package MainPkg.java;
 
 import java.util.Arrays;
 import java.nio.ByteBuffer;
-import java.io.IOException;
 import java.nio.ByteOrder;
 
 /*

@@ -1,4 +1,4 @@
-package MainPkg;
+package MainPkg.java;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
@@ -49,8 +49,6 @@ public class Controller {
     }
 
     @FXML private void injectButton() {
-        TextFields_Strings[1] = "C:\\Users\\jason\\Desktop\\TADpole_jason\\resources\\movable.sed";
-        TextFields_Strings[3] = "C:\\Users\\jason\\Desktop\\ctcert\\angelsl\\ctcert.bin";
         try {
             Seedplanter planter = new Seedplanter(TextFields_Strings[0], TextFields_Strings[1], TextFields_Strings[2], TextFields_Strings[3]);
             planter.DoInjection();

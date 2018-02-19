@@ -1,4 +1,4 @@
-package MainPkg;
+package MainPkg.java;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -23,15 +23,21 @@ public class Seedplanter {
 
     public void DoInjection() throws IOException {
         /*
-            DSiWare is in RAM, movable.sed is in RAM, the (extracted) stuff from the injection ZIP is in RAM
+            DSiWare is in RAM, movable.sed is in RAM, the (extracted) stuff from the injection ZIP is in RAM. now what?
+
             1) Decrypt the DSiWare. Theoretically there should now be a multi-dimensional array returned with all the decrypted data
                 Maybe instead of returning a multi-dimensional array, make it slot everything into the Data POD class?
             2) Now that the decrypted data is in RAM, we can call arraycopy to inject the srl.nds, and we can use the FAT code to inject savedata
-            3) Now we export footer.bin and ctr-dsiwaretool.exe to the OS's temp directory
+            3) Now we export footer.bin the OS's temp directory
+                you can use Data#exportToTmpDir()
             4) Call ctr-dsiwaretool.exe to sign the footer
+                use System.getRuntime.exec()
             5) Re-import footer.bin into RAM
+                make a new method in Data class
             6) Encrypt the DSiWare
             7) Export the encrypted DSiWare to desktop
+                the cherry on top of the cake
+
             Done!
          */
     }

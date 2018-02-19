@@ -1,4 +1,4 @@
-package MainPkg;
+package MainPkg.java;
 
 import java.util.Arrays;
 import java.io.IOException;
