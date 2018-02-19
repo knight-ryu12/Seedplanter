@@ -22,4 +22,4 @@
 hs_err_pid*
 
 # binaries
-/out
+out/
