@@ -1,4 +1,4 @@
-package MainPkg.java;
+package Seedplanter.java;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -14,7 +14,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         primaryStage.setTitle("Seedplanter");
-        primaryStage.setScene(new Scene(FXMLLoader.load(getClass().getResource("/MainPkg/resources/MainGUI.fxml")), 400, 300));
+        primaryStage.setScene(new Scene(FXMLLoader.load(getClass().getResource("/Seedplanter/resources/MainGUI.fxml")), 400, 300));
         primaryStage.show();
     }
 
