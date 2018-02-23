@@ -3,6 +3,8 @@ import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import java.io.IOException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
 
 public class Controller {
     @FXML private TextField dsiWare_TextField, movableSed_TextField, injectionZip_TextField, ctcert_TextField;
@@ -47,17 +49,12 @@ public class Controller {
     }
 
     @FXML private void injectButton() {
-        TextFields_Strings[0] = "C:\\Users\\jason\\Desktop\\TADpole_jason\\4B554E56.bin";
-        TextFields_Strings[1] = "C:\\Users\\jason\\Desktop\\TADpole_jason\\resources\\movable.sed";
-        TextFields_Strings[2] = "C:\\Users\\jason\\Desktop\\DSiWare_eur_sudokuhax_injection.zip";
-        TextFields_Strings[3] = "C:\\Users\\jason\\Desktop\\ctcert\\angelsl\\ctcert.bin";
-
         try {
             Seedplanter planter = new Seedplanter(TextFields_Strings[0], TextFields_Strings[1], TextFields_Strings[2], TextFields_Strings[3]);
             planter.DoInjection();
-            Main.showAlertBox("Done!", null, "Everything went well!");
-        } catch (IOException e) {
-            Main.showAlertBox("An exception occurred!", null, e.getMessage());
+            Main.showAlertBox("Done!", null, "Everything went well!", false);
+        } catch (InvalidKeyException | InvalidAlgorithmParameterException | IOException e) {
+            Main.showAlertBox("An exception occurred!", null, e.getMessage(), true);
         }
     }
 }

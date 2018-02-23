@@ -23,13 +23,18 @@ public class DataHandling {
             if (ZIPR == ZipHandling.ZipRegion.ZIP_ERROR)
                 throw new IOException("ZIP Region Error");
 
-            if (ZIPR == ZipHandling.ZipRegion.ZIP_EUR || ZIPR == ZipHandling.ZipRegion.ZIP_USA)
-                readFilesEURUSA(zf);
-            else if (ZIPR == ZipHandling.ZipRegion.ZIP_JPN)
+            if (ZIPR == ZipHandling.ZipRegion.ZIP_EUR || ZIPR == ZipHandling.ZipRegion.ZIP_USA) {
+                MainData.put("app", ZipHandling.ReadAllBytesFromZipEntry(zf, "app"));
+                MainData.put("savedata.bin", ZipHandling.ReadAllBytesFromZipEntry(zf, "savedata/savedata.bin"));
+            }
+            else if (ZIPR == ZipHandling.ZipRegion.ZIP_JPN) {
                 throw new IOException("JPN region is not supported yet!");
+            }
 
-            readMovableSed(movableSedStr);
-            readDSiWare(DSiWareStr);
+            MainData.put("movable.sed", new byte[16]);
+            System.arraycopy(Files.readAllBytes(Paths.get(movableSedStr)), 0x110, MainData.get("movable.sed"), 0, 16);
+
+            MainData.put("dsiware.bin", Files.readAllBytes(Paths.get(DSiWareStr)));
 
             //===============================================================
             //==========Copy dsiwaretool and DLLs/ctcert to tmpDir===========
@@ -44,20 +49,6 @@ public class DataHandling {
         } catch (IOException e) {
             throw e;
         }
-    }
-
-    private void readFilesEURUSA(ZipFile zf) throws IOException {
-        MainData.put("sudoku_v0.app", ZipHandling.ReadAllBytesFromZipEntry(zf, "sudoku_v0.app"));
-        MainData.put("savedata.bin", ZipHandling.ReadAllBytesFromZipEntry(zf, "savedata/savedata.bin"));
-    }
-
-    private void readMovableSed(String movableSedStr) throws IOException {
-        MainData.put("movable.sed", new byte[16]);
-        System.arraycopy(Files.readAllBytes(Paths.get(movableSedStr)), 0x110, MainData.get("movable.sed"), 0, 16);
-    }
-
-    private void readDSiWare(String DSiWareStr) throws IOException {
-        MainData.put("dsiware.bin", Files.readAllBytes(Paths.get(DSiWareStr)));
     }
 
     public void exportToFile(byte[] filedata, Path filename) throws IOException {
