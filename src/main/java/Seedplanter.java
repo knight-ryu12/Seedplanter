@@ -1,4 +1,6 @@
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -45,13 +47,21 @@ public class Seedplanter {
 
         //Export footer.bin
         String tmpDirPath = Data.getTmpdirPath().toString();
-        Path footerPath = Paths.get(tmpDirPath, "/footer.bin");
+        Path footerPath = Paths.get(tmpDirPath, "footer.bin");
         Data.exportToFile(Data.MainData.get("footer.bin"), footerPath);
 
         //Sign footer.bin
-        Runtime.getRuntime().exec(
-                tmpDirPath + "/ctr-dsiwaretool.exe " + tmpDirPath + "/footer.bin " + tmpDirPath + "/ctcert.bin --write"
+        System.out.println("==========SIGNING=========");
+        Runtime rt = Runtime.getRuntime();
+        Process proc = rt.exec(
+                tmpDirPath + "/ctr-dsiwaretool.exe " + tmpDirPath + "/footer.bin " + tmpDirPath + "/ctcert.bin " + "--write"
         );
+        BufferedReader stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+        String s;
+        while ((s = stdInput.readLine()) != null) {
+            System.out.println(s);
+        }
+        System.out.println("==========SIGNING IS DONE=========");
 
         //Re-import it back
         System.arraycopy(Data.importToByteArray(footerPath), 0, Data.MainData.get("footer.bin"), 0, Data.MainData.get("footer.bin").length);

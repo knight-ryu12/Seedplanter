@@ -46,8 +46,6 @@ public class DataHandling {
             Files.copy(getClass().getResourceAsStream("zlib1__.dll"), Paths.get(tmpDir.toString(), "zlib1__.dll"));
 
             Files.copy(Paths.get(ctcertStr), Paths.get(tmpDir.toString(), "ctcert.bin"));
-        } catch (IOException e) {
-            throw e;
         }
     }
 

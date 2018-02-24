@@ -71,17 +71,15 @@ public class Crypto {
         byte[] ret = new byte[0x20];
         byte[] hash = md.digest(content);
         // Generating CMAC here.
-        CipherParameters cp = new KeyParameter(normalKey);
-        //BlockCipher aes = new AESEngine();
-        CMac mac = new CMac(new AESEngine(),128);
-        mac.init(cp);
-        mac.update(hash,0,hash.length);
-        mac.doFinal(ret,0);
-        System.out.println(Hex.encodeHexString(ret));
+        CMac mac = new CMac(new AESEngine(), 128);
+        mac.init(new KeyParameter(normalKey));
+        mac.update(hash, 0, hash.length);
+        mac.doFinal(ret, 0);
         //Generate IV here
         byte[] iv = new byte[0x10];
         sr.nextBytes(iv);
         System.arraycopy(iv, 0, ret, 0x10, iv.length);
+        System.out.println(Hex.encodeHexString(ret));
         return ret;
     }
 }
