@@ -38,6 +38,7 @@ public class Seedplanter {
             fat.copySingleFileToRoot("SAVEDATABIN", Data.MainData.get("savedata.bin"));
         else if (Data.getZipRegion() == ZipHandling.ZipRegion.ZIP_JPN)
             throw new IOException("I said JPN region doesn't work yet!!!");
+        fat.copyFATable();
 
         //Fix footer/header
         TADPole.fixHash(Data.MainData);
