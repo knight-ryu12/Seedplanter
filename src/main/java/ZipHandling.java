@@ -14,8 +14,7 @@ public class ZipHandling {
 
     public static ZipRegion CheckRegion(byte[] ZIPdata) throws IOException {
         MessageDigest ZIP_MSGD = null; try { ZIP_MSGD = MessageDigest.getInstance("SHA-256"); } catch (Exception e) {} //Stupid NoSuchAlgorithmException wants me to catch it
-        ZIP_MSGD.update(ZIPdata);
-        byte[] ZIP_SHA256 = ZIP_MSGD.digest();
+        byte[] ZIP_SHA256 = ZIP_MSGD.digest(ZIPdata);
 
         if (Arrays.equals(ZIP_SHA256, Sudoku_EUR_SHA256) ) {
             return ZipRegion.ZIP_EUR;

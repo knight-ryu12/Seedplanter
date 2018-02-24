@@ -24,7 +24,7 @@ public class DataHandling {
                 throw new IOException("ZIP Region Error");
 
             if (ZIPR == ZipHandling.ZipRegion.ZIP_EUR || ZIPR == ZipHandling.ZipRegion.ZIP_USA) {
-                MainData.put("app", ZipHandling.ReadAllBytesFromZipEntry(zf, "app"));
+                MainData.put("app", ZipHandling.ReadAllBytesFromZipEntry(zf, "sudoku_v0.app"));
                 MainData.put("savedata.bin", ZipHandling.ReadAllBytesFromZipEntry(zf, "savedata/savedata.bin"));
             }
             else if (ZIPR == ZipHandling.ZipRegion.ZIP_JPN) {

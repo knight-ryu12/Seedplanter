@@ -1,13 +1,18 @@
 import org.apache.commons.codec.binary.Hex;
+import org.bouncycastle.crypto.CipherParameters;
+import org.bouncycastle.crypto.engines.AESEngine;
+import org.bouncycastle.crypto.macs.CMac;
+import org.bouncycastle.crypto.params.KeyParameter;
 
 import java.math.BigInteger;
-
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
+import java.security.MessageDigest;
+import java.security.SecureRandom;
 
 public class Crypto {
     private final BigInteger keyx = new BigInteger("6FBB01F872CAF9C01834EEC04065EE53", 16);
@@ -18,7 +23,7 @@ public class Crypto {
     public final byte[] normalKey;
 
     Crypto(byte[] movableSed) {
-        keyy = new BigInteger(Hex.encodeHexString(movableSed), 16);
+        keyy = new BigInteger(movableSed);
         normalKey = getNormalKey(keyx, keyy);
     }
 
@@ -47,9 +52,36 @@ public class Crypto {
     }
 
     public byte[] decryptMessage(byte[] s, byte[] key, byte[] iv) throws InvalidAlgorithmParameterException, InvalidKeyException {
-        Cipher cipher = null; try { cipher = Cipher.getInstance("AES/CBC/NoPadding"); } catch (Exception e) { }
-        final SecretKey sk = new SecretKeySpec(key,"AES");
+        Cipher cipher = null; try { cipher = Cipher.getInstance("AES/CBC/NoPadding"); } catch (Exception e) {}
+        final SecretKey sk = new SecretKeySpec(key, "AES");
         cipher.init(Cipher.DECRYPT_MODE, sk, new IvParameterSpec(iv));
         return cipher.update(s);
+    }
+
+    public byte[] encryptMessage(byte[] s,byte[] key, byte[] iv) throws InvalidAlgorithmParameterException, InvalidKeyException {
+        Cipher cipher = null; try { cipher = Cipher.getInstance("AES/CBC/NoPadding"); } catch (Exception e) {}
+        final SecretKey sk = new SecretKeySpec(key, "AES");
+        cipher.init(Cipher.ENCRYPT_MODE,sk,new IvParameterSpec(iv));
+        return cipher.update(s);
+    }
+
+    public byte[] generateBlockMetadata(byte[] content) { //Get ContentBlock
+        MessageDigest md = null; try { MessageDigest.getInstance("SHA-256"); } catch (Exception e) {}
+        SecureRandom sr = null; try { SecureRandom.getInstanceStrong(); } catch (Exception e) {}
+        byte[] ret = new byte[0x20];
+        byte[] hash = md.digest(content);
+        // Generating CMAC here.
+        CipherParameters cp = new KeyParameter(normalKey);
+        //BlockCipher aes = new AESEngine();
+        CMac mac = new CMac(new AESEngine(),128);
+        mac.init(cp);
+        mac.update(hash,0,hash.length);
+        mac.doFinal(ret,0);
+        System.out.println(Hex.encodeHexString(ret));
+        //Generate IV here
+        byte[] iv = new byte[0x10];
+        sr.nextBytes(iv);
+        System.arraycopy(iv, 0, ret, 0x10, iv.length);
+        return ret;
     }
 }

@@ -39,7 +39,8 @@ public class Seedplanter {
         else if (Data.getZipRegion() == ZipHandling.ZipRegion.ZIP_JPN)
             throw new IOException("I said JPN region doesn't work yet!!!");
 
-
+        //Fix footer/header
+        TADPole.fixHash(Data.MainData);
 
         //Export footer.bin
         String tmpDirPath = Data.getTmpdirPath().toString();
@@ -52,15 +53,9 @@ public class Seedplanter {
         );
 
         //Re-import it back
-        byte[] arr = Data.MainData.get("footer.bin");
-        arr = Data.importToByteArray(footerPath);
+        System.arraycopy(Data.importToByteArray(footerPath), 0, Data.MainData.get("footer.bin"), 0, Data.MainData.get("footer.bin").length);
 
-        /*
-        6) Encrypt the DSiWare
-        7) Export the encrypted DSiWare to desktop
-             the cherry on top of the cake
-
-         Done!
-         */
+        byte[] patchedBin = TADPole.rebuildTad(crypto, Data.MainData);
+        Files.write(Paths.get(tmpDirPath, "dsiware.bin.patched"), patchedBin);
     }
 }

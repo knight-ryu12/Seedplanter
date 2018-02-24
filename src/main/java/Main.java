@@ -16,11 +16,11 @@ public class Main extends Application {
         primaryStage.show();
     }
 
-    public static void showAlertBox(String Title, String Header, String content, boolean isError) {
+    public static void showAlertBox(String Title, String Header, String Content, boolean isError) {
         Alert alert = new Alert((isError) ? Alert.AlertType.ERROR : Alert.AlertType.INFORMATION);
         alert.setTitle(Title);
         alert.setHeaderText(Header); //can be null
-        alert.setContentText(content);
+        alert.setContentText(Content);
         alert.showAndWait();
     }
 }
