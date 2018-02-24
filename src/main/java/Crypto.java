@@ -66,8 +66,8 @@ public class Crypto {
     }
 
     public byte[] generateBlockMetadata(byte[] content) { //Get ContentBlock
-        MessageDigest md = null; try { MessageDigest.getInstance("SHA-256"); } catch (Exception e) {}
-        SecureRandom sr = null; try { SecureRandom.getInstanceStrong(); } catch (Exception e) {}
+        MessageDigest md = null; try { md = MessageDigest.getInstance("SHA-256"); } catch (Exception e) {}
+        SecureRandom sr = null; try { sr = SecureRandom.getInstanceStrong(); } catch (Exception e) {}
         byte[] ret = new byte[0x20];
         byte[] hash = md.digest(content);
         // Generating CMAC here.

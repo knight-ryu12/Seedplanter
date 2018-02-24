@@ -43,7 +43,6 @@ public class TADPole {
         long[] contents = getContentSize(hashmap.get("header.bin"));
         int off = 0x4630;
         for (int i = 0; i < 11; i++) {
-
             if (contents[i] != 0) {
                 hashmap.put(content_list[i], getDump(crypto, DSiWare, off, (int)contents[i]));
                 off += (contents[i] + 0x20);
