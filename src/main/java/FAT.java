@@ -51,7 +51,7 @@ public class FAT {
         FATC.DataStartSector = FATC.RootStartSector + ((FATC.BPB_RootEntCnt * 0x20) / FATC.BPB_BytsPerSec);
     }
 
-    private void setFATTableEntry(int FATentry, int value) {
+    private void setFATableEntry(int FATentry, int value) {
         int FATableAddr = FATC.FATableStartSector * FATC.BPB_BytsPerSec;
 
         int offset;
@@ -119,13 +119,13 @@ public class FAT {
         int File_NumOfClusters = filedata.length / (FATC.BPB_SecPerClus * FATC.BPB_BytsPerSec);
         File_NumOfClusters += (filedata.length % (FATC.BPB_SecPerClus * FATC.BPB_BytsPerSec) == 0) ? 0 : 1; //If it doesn't fit entirely in one cluster, you need to add another extra cluster
         for (int i = 0; i < File_NumOfClusters; i++) {
-            setFATTableEntry(2 + i, 2 + 1 + i);
+            setFATableEntry(2 + i, 2 + 1 + i);
         }
-        setFATTableEntry(2 + File_NumOfClusters - 1, 0xFFF); //Set the final entry to 0xFFF to signal the end of a file
+        setFATableEntry(2 + File_NumOfClusters - 1, 0xFFF); //Set the final entry to 0xFFF to signal the end of a file
     }
 
     //copy the first FAT table into the second FAT table
-    public void copyFATTable() {
+    public void copyFATable() {
         int RootStartAddr = FATC.RootStartSector * FATC.BPB_BytsPerSec;
         int FATSzBytes = FATC.BPB_FATSz16 * FATC.BPB_BytsPerSec;
         System.arraycopy(FatIMG, RootStartAddr, FatIMG, (RootStartAddr + FATSzBytes), FATSzBytes);
