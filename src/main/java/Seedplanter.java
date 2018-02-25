@@ -7,6 +7,7 @@ import java.security.InvalidKeyException;
 
 public class Seedplanter {
     private DataHandling Data;
+    private String targetfile;
 
     //The constructor will read in all of the files into byte arrays
     Seedplanter(String DSiWareStr, String movableSedStr, String injectionZipStr, String ctcertStr) throws IOException {
@@ -19,6 +20,8 @@ public class Seedplanter {
         if (ctcertStr == null || Files.notExists(Paths.get(ctcertStr)))
             throw new IOException("ctcert.bin not found!");
 
+        targetfile = Paths.get(DSiWareStr).toFile().getName();
+        
         Data = new DataHandling(DSiWareStr, movableSedStr, injectionZipStr, ctcertStr);
     }
 
@@ -38,24 +41,26 @@ public class Seedplanter {
             fat.copySingleFileToRoot("SAVEDATABIN", Data.MainData.get("savedata.bin"));
         else if (Data.getZipRegion() == ZipHandling.ZipRegion.ZIP_JPN)
             throw new IOException("I said JPN region doesn't work yet!!!");
+        fat.copyFATable();
 
         //Fix footer/header
         TADPole.fixHash(Data.MainData);
 
         //Export footer.bin
         String tmpDirPath = Data.getTmpdirPath().toString();
-        Path footerPath = Paths.get(tmpDirPath, "/footer.bin");
+        Path footerPath = Paths.get(tmpDirPath, "footer.bin");
         Data.exportToFile(Data.MainData.get("footer.bin"), footerPath);
 
         //Sign footer.bin
         Runtime.getRuntime().exec(
-                tmpDirPath + "/ctr-dsiwaretool.exe " + tmpDirPath + "/footer.bin " + tmpDirPath + "/ctcert.bin --write"
+                tmpDirPath + "/ctr-dsiwaretool.exe " + tmpDirPath + "/footer.bin " + tmpDirPath + "/ctcert.bin " + "--write"
         );
 
         //Re-import it back
         System.arraycopy(Data.importToByteArray(footerPath), 0, Data.MainData.get("footer.bin"), 0, Data.MainData.get("footer.bin").length);
 
+        Path desktopPath = Paths.get(System.getProperty("user.home") + "/Desktop/" + targetfile);
         byte[] patchedBin = TADPole.rebuildTad(crypto, Data.MainData);
-        Files.write(Paths.get(tmpDirPath, "dsiware.bin.patched"), patchedBin);
+        Files.write(desktopPath, patchedBin);
     }
 }

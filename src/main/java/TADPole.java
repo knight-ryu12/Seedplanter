@@ -1,4 +1,3 @@
-import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 
 import java.nio.ByteBuffer;
@@ -98,7 +97,7 @@ public class TADPole {
         full_namelist[0] = "banner.bin";
         full_namelist[1] = "header.bin";
         full_namelist[2] = "footer.bin";
-        for (int i = 3; i < content_list.length; i++) {
+        for (int i = 3; i < 14; i++) {
             full_namelist[i] = content_list[i - 3];
         }
         byte[] bm;
@@ -122,7 +121,6 @@ public class TADPole {
                 offset += section.length;
             }
         }
-
         return targetarr;
     }
 }
