@@ -1,6 +1,4 @@
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -9,6 +7,7 @@ import java.security.InvalidKeyException;
 
 public class Seedplanter {
     private DataHandling Data;
+    private String targetfile;
 
     //The constructor will read in all of the files into byte arrays
     Seedplanter(String DSiWareStr, String movableSedStr, String injectionZipStr, String ctcertStr) throws IOException {
@@ -21,6 +20,8 @@ public class Seedplanter {
         if (ctcertStr == null || Files.notExists(Paths.get(ctcertStr)))
             throw new IOException("ctcert.bin not found!");
 
+        targetfile = Paths.get(DSiWareStr).toFile().getName();
+        
         Data = new DataHandling(DSiWareStr, movableSedStr, injectionZipStr, ctcertStr);
     }
 
@@ -51,22 +52,15 @@ public class Seedplanter {
         Data.exportToFile(Data.MainData.get("footer.bin"), footerPath);
 
         //Sign footer.bin
-        System.out.println("==========SIGNING=========");
-        Runtime rt = Runtime.getRuntime();
-        Process proc = rt.exec(
+        Runtime.getRuntime().exec(
                 tmpDirPath + "/ctr-dsiwaretool.exe " + tmpDirPath + "/footer.bin " + tmpDirPath + "/ctcert.bin " + "--write"
         );
-        BufferedReader stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));
-        String s;
-        while ((s = stdInput.readLine()) != null) {
-            System.out.println(s);
-        }
-        System.out.println("==========SIGNING IS DONE=========");
 
         //Re-import it back
         System.arraycopy(Data.importToByteArray(footerPath), 0, Data.MainData.get("footer.bin"), 0, Data.MainData.get("footer.bin").length);
 
+        Path desktopPath = Paths.get(System.getProperty("user.home") + "/Desktop/" + targetfile);
         byte[] patchedBin = TADPole.rebuildTad(crypto, Data.MainData);
-        Files.write(Paths.get(tmpDirPath, "dsiware.bin.patched"), patchedBin);
+        Files.write(desktopPath, patchedBin);
     }
 }

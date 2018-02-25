@@ -1,4 +1,3 @@
-import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 
 import java.nio.ByteBuffer;
@@ -75,8 +74,6 @@ public class TADPole {
                 hash[i] = Hex.encodeHexString(md.digest(curarr));
             else
                 hash[i] = "0000000000000000000000000000000000000000000000000000000000000000";
-
-            System.out.println(footer_namelist[i] + " is --> " + hash[i]);
         }
 
         //write the sizes in the header
@@ -100,7 +97,7 @@ public class TADPole {
         full_namelist[0] = "banner.bin";
         full_namelist[1] = "header.bin";
         full_namelist[2] = "footer.bin";
-        for (int i = 3; i < content_list.length; i++) {
+        for (int i = 3; i < 14; i++) {
             full_namelist[i] = content_list[i - 3];
         }
         byte[] bm;
@@ -123,7 +120,6 @@ public class TADPole {
                 offset += section.length;
             }
         }
-
         return targetarr;
     }
 }

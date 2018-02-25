@@ -1,0 +1,17 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="Seedplanter">
+    <output-path>$PROJECT_DIR$/out/artifacts/Seedplanter</output-path>
+    <root id="archive" name="Seedplanter.jar">
+      <element id="directory" name="META-INF">
+        <element id="file-copy" path="$PROJECT_DIR$/src/main/resources/META-INF/MANIFEST.MF" />
+      </element>
+      <element id="module-output" name="Seedplanter" />
+      <element id="library" level="project" name="Maven: commons-codec:commons-codec:1.11" />
+      <element id="library" level="project" name="Maven: commons-io:commons-io:2.6" />
+      <element id="library" level="project" name="Maven: org.apache.commons:commons-lang3:3.7" />
+      <element id="library" level="project" name="Maven: org.bouncycastle:bcprov-jdk15on:1.59" />
+      <element id="library" level="project" name="Maven: org.checkerframework:checker-compat-qual:2.0.0" />
+      <element id="library" level="project" name="Maven: org.codehaus.mojo:animal-sniffer-annotations:1.14" />
+    </root>
+  </artifact>
+</component>

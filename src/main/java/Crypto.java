@@ -1,5 +1,3 @@
-import org.apache.commons.codec.binary.Hex;
-import org.bouncycastle.crypto.CipherParameters;
 import org.bouncycastle.crypto.engines.AESEngine;
 import org.bouncycastle.crypto.macs.CMac;
 import org.bouncycastle.crypto.params.KeyParameter;
@@ -18,7 +16,7 @@ public class Crypto {
     private final BigInteger keyx = new BigInteger("6FBB01F872CAF9C01834EEC04065EE53", 16);
     private final BigInteger F128 = new BigInteger("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF", 16);
     private final BigInteger C    = new BigInteger("1FF9E9AAC5FE0408024591DC5D52768A", 16);
-    public final BigInteger cmac_keyx = new BigInteger("B529221CDDB5DB5A1BF26EFF2041E875", 16);
+    private final BigInteger cmac_keyx = new BigInteger("B529221CDDB5DB5A1BF26EFF2041E875", 16);
     private BigInteger keyy;
     public final byte[] normalKey;
 
@@ -70,16 +68,18 @@ public class Crypto {
         SecureRandom sr = null; try { sr = SecureRandom.getInstanceStrong(); } catch (Exception e) {}
         byte[] ret = new byte[0x20];
         byte[] hash = md.digest(content);
+
         // Generating CMAC here.
+        byte[] cmac_key = getNormalKey(cmac_keyx,keyy);
+
         CMac mac = new CMac(new AESEngine(), 128);
-        mac.init(new KeyParameter(normalKey));
+        mac.init(new KeyParameter(cmac_key));
         mac.update(hash, 0, hash.length);
         mac.doFinal(ret, 0);
         //Generate IV here
         byte[] iv = new byte[0x10];
         sr.nextBytes(iv);
         System.arraycopy(iv, 0, ret, 0x10, iv.length);
-        System.out.println(Hex.encodeHexString(ret));
         return ret;
     }
 }
