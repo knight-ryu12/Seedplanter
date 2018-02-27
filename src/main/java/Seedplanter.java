@@ -10,19 +10,19 @@ public class Seedplanter {
     private String targetfile;
 
     //The constructor will read in all of the files into byte arrays
-    Seedplanter(String DSiWareStr, String movableSedStr, String injectionZipStr, String ctcertStr) throws IOException {
-        if (DSiWareStr == null || Files.notExists(Paths.get(DSiWareStr)))
+    Seedplanter(Path DSiWare, Path movableSed, Path injectionZip, Path ctcert) throws IOException {
+        if (DSiWare == null || Files.notExists(DSiWare))
             throw new IOException("DSiWare not found!");
-        if (movableSedStr == null || Files.notExists(Paths.get(movableSedStr)))
+        if (movableSed == null || Files.notExists(movableSed))
             throw new IOException("movable.sed not found!");
-        if (injectionZipStr == null || Files.notExists(Paths.get(injectionZipStr)))
+        if (injectionZip == null || Files.notExists(injectionZip))
             throw new IOException("Injection ZIP not found!");
-        if (ctcertStr == null || Files.notExists(Paths.get(ctcertStr)))
+        if (ctcert == null || Files.notExists(ctcert))
             throw new IOException("ctcert.bin not found!");
 
-        targetfile = Paths.get(DSiWareStr).toFile().getName();
-        
-        Data = new DataHandling(DSiWareStr, movableSedStr, injectionZipStr, ctcertStr);
+        targetfile = DSiWare.toFile().getName();
+
+        Data = new DataHandling(DSiWare, movableSed, injectionZip, ctcert);
     }
 
     public void DoInjection() throws IOException, InvalidKeyException, InvalidAlgorithmParameterException {
@@ -35,13 +35,14 @@ public class Seedplanter {
         System.arraycopy(Data.MainData.get("app"), 0, Data.MainData.get("srl.nds"), 0, Data.MainData.get("app").length);
 
         //Inject the save
-        FAT fat = new FAT(Data.MainData.get("public.sav"));
-        fat.clearRoot();
-        if (Data.getZipRegion() == ZipHandling.ZipRegion.ZIP_EUR || Data.getZipRegion() == ZipHandling.ZipRegion.ZIP_USA)
+        if (Data.getZipRegion() == ZipHandling.ZipRegion.ZIP_EUR || Data.getZipRegion() == ZipHandling.ZipRegion.ZIP_USA) {
+            FAT fat = new FAT(Data.MainData.get("public.sav"));
+            fat.clearRoot();
             fat.copySingleFileToRoot("SAVEDATABIN", Data.MainData.get("savedata.bin"));
-        else if (Data.getZipRegion() == ZipHandling.ZipRegion.ZIP_JPN)
-            throw new IOException("I said JPN region doesn't work yet!!!");
-        fat.copyFATable();
+            fat.copyFATable();
+        } else if (Data.getZipRegion() == ZipHandling.ZipRegion.ZIP_JPN) {
+            System.arraycopy(Data.MainData.get("jpn_public.sav"), 0, Data.MainData.get("public.sav"), 0, Data.MainData.get("jpn_public.sav").length);
+        }
 
         //Fix footer/header
         TADPole.fixHash(Data.MainData);

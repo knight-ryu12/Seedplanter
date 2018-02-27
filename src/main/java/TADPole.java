@@ -42,7 +42,6 @@ public class TADPole {
         long[] contents = getContentSize(hashmap.get("header.bin"));
         int off = 0x4630;
         for (int i = 0; i < 11; i++) {
-
             if (contents[i] != 0) {
                 hashmap.put(content_list[i], getDump(crypto, DSiWare, off, (int)contents[i]));
                 off += (contents[i] + 0x20);
@@ -86,8 +85,9 @@ public class TADPole {
 
         //write the hashes in the footer
         try {
+            byte[] footerarr = hashmap.get("footer.bin");
             for (int i = 0; i < 13; i++) {
-                System.arraycopy(Hex.decodeHex(hash[i]), 0, hashmap.get("footer.bin"), (i * 0x20), 0x20);
+                System.arraycopy(Hex.decodeHex(hash[i]), 0, footerarr, (i * 0x20), 0x20);
             }
         } catch (Exception e) {} //TODO: Move from strings to byte arrays for the hashes
     }
@@ -101,14 +101,13 @@ public class TADPole {
             full_namelist[i] = content_list[i - 3];
         }
         byte[] bm;
-        byte[] content;
         byte[] section;
         byte[] iv = new byte[0x10];
         byte[] targetarr = new byte[hashmap.get("dsiware.bin").length];
 
         int offset = 0;
         for (String s : full_namelist) {
-            content = hashmap.get(s);
+            byte[] content = hashmap.get(s);
             if (content != null) {
                 bm = crypto.generateBlockMetadata(content); // 0x0+10 = AES MAC over SHA256(SHA256 of PlainData), 0x10+10 = IV (RandGen)
                 System.arraycopy(bm, 0x10, iv, 0, iv.length); // bm -> iv

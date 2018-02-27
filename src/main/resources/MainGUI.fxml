@@ -25,14 +25,14 @@
       <Button mnemonicParsing="false" onAction="#dsiWare_BrowseButton" text="Browse" GridPane.columnIndex="2" GridPane.halignment="CENTER" />
       <Button mnemonicParsing="false" onAction="#movableSed_BrowseButton" text="Browse" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
       <Button mnemonicParsing="false" onAction="#injectionZip_BrowseButton" text="Browse" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
-      <TextField fx:id="dsiWare_TextField" onKeyPressed="#dsiWare_UpdateTextField" GridPane.columnIndex="1" />
-      <TextField fx:id="movableSed_TextField" onKeyPressed="#movableSed_UpdateTextField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-      <TextField fx:id="injectionZip_TextField" onKeyPressed="#injectionZip_UpdateTextField" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+      <TextField fx:id="dsiWare_TextField" GridPane.columnIndex="1" />
+      <TextField fx:id="movableSed_TextField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+      <TextField fx:id="injectionZip_TextField" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+      <TextField fx:id="ctcert_TextField" GridPane.columnIndex="1" GridPane.rowIndex="3" />
       <Label alignment="TOP_LEFT" text="DSiWare" GridPane.halignment="CENTER" />
       <Label text="movable.sed" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
       <Label text="Injection zip" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
       <Button mnemonicParsing="false" onAction="#ctcert_BrowseButton" text="Browse" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="3" />
-      <TextField fx:id="ctcert_TextField" onKeyPressed="#ctcert_UpdateTextField" GridPane.columnIndex="1" GridPane.rowIndex="3" />
       <Label text="ctcert.bin" GridPane.halignment="CENTER" GridPane.rowIndex="3" />
       <Button alignment="CENTER" mnemonicParsing="false" onAction="#injectButton" prefHeight="25.0" prefWidth="70.0" text="Inject" textAlignment="CENTER" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="4">
          <font>
