@@ -1,2 +1,2 @@
 # Seedplanter
-Jason+Chroma representation of TADPole
+Jason + Chromaryu implementation of [TADpole](https://github.com/zoogie/TADpole/) in Java 8 (with GUI!)

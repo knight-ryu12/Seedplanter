@@ -1,4 +1,6 @@
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -7,19 +9,22 @@ import java.security.InvalidKeyException;
 
 public class Seedplanter {
     private DataHandling Data;
+    private Path targetfile;
 
     //The constructor will read in all of the files into byte arrays
-    Seedplanter(String DSiWareStr, String movableSedStr, String injectionZipStr, String ctcertStr) throws IOException {
-        if (DSiWareStr == null || Files.notExists(Paths.get(DSiWareStr)))
+    Seedplanter(Path DSiWare, Path movableSed, Path injectionZip, Path ctcert) throws IOException {
+        if (DSiWare == null || Files.notExists(DSiWare))
             throw new IOException("DSiWare not found!");
-        if (movableSedStr == null || Files.notExists(Paths.get(movableSedStr)))
+        if (movableSed == null || Files.notExists(movableSed))
             throw new IOException("movable.sed not found!");
-        if (injectionZipStr == null || Files.notExists(Paths.get(injectionZipStr)))
+        if (injectionZip == null || Files.notExists(injectionZip))
             throw new IOException("Injection ZIP not found!");
-        if (ctcertStr == null || Files.notExists(Paths.get(ctcertStr)))
+        if (ctcert == null || Files.notExists(ctcert))
             throw new IOException("ctcert.bin not found!");
 
-        Data = new DataHandling(DSiWareStr, movableSedStr, injectionZipStr, ctcertStr);
+        targetfile = DSiWare;
+
+        Data = new DataHandling(DSiWare, movableSed, injectionZip, ctcert);
     }
 
     public void DoInjection() throws IOException, InvalidKeyException, InvalidAlgorithmParameterException {
@@ -32,30 +37,44 @@ public class Seedplanter {
         System.arraycopy(Data.MainData.get("app"), 0, Data.MainData.get("srl.nds"), 0, Data.MainData.get("app").length);
 
         //Inject the save
-        FAT fat = new FAT(Data.MainData.get("public.sav"));
-        fat.clearRoot();
-        if (Data.getZipRegion() == ZipHandling.ZipRegion.ZIP_EUR || Data.getZipRegion() == ZipHandling.ZipRegion.ZIP_USA)
+        if (Data.getZipRegion() == ZipHandling.ZipRegion.ZIP_EUR || Data.getZipRegion() == ZipHandling.ZipRegion.ZIP_USA) {
+            FAT fat = new FAT(Data.MainData.get("public.sav"));
+            fat.clearRoot();
             fat.copySingleFileToRoot("SAVEDATABIN", Data.MainData.get("savedata.bin"));
-        else if (Data.getZipRegion() == ZipHandling.ZipRegion.ZIP_JPN)
-            throw new IOException("I said JPN region doesn't work yet!!!");
+            fat.copyFATable();
+        } else if (Data.getZipRegion() == ZipHandling.ZipRegion.ZIP_JPN) {
+            System.arraycopy(Data.MainData.get("jpn_public.sav"), 0, Data.MainData.get("public.sav"), 0, Data.MainData.get("jpn_public.sav").length);
+        }
 
         //Fix footer/header
         TADPole.fixHash(Data.MainData);
 
         //Export footer.bin
         String tmpDirPath = Data.getTmpdirPath().toString();
-        Path footerPath = Paths.get(tmpDirPath, "/footer.bin");
+        Path footerPath = Paths.get(tmpDirPath, "footer.bin");
         Data.exportToFile(Data.MainData.get("footer.bin"), footerPath);
 
         //Sign footer.bin
-        Runtime.getRuntime().exec(
-                tmpDirPath + "/ctr-dsiwaretool.exe " + tmpDirPath + "/footer.bin " + tmpDirPath + "/ctcert.bin --write"
-        );
+        System.out.println("============== EXECUTING CTR-DSIWARETOOL ==============");
+        Process proc = Runtime.getRuntime().exec(tmpDirPath + "/ctr-dsiwaretool.exe " + tmpDirPath + "/footer.bin " + tmpDirPath + "/ctcert.bin " + "--write");
+
+        // read the output from the command
+        System.out.println("============== OUTPUT FROM CTR-DSIWARETOOL ==============");
+        BufferedReader stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+        BufferedReader stdError = new BufferedReader(new InputStreamReader(proc.getErrorStream()));
+
+        String str;
+        while ((str = stdInput.readLine()) != null)
+            System.out.println(str);
+        // read any errors from the attempted command
+        while ((str = stdError.readLine()) != null)
+            System.out.println(str);
+        System.out.println("============== END OF CTR-DSIWARETOOL ==============");
 
         //Re-import it back
         System.arraycopy(Data.importToByteArray(footerPath), 0, Data.MainData.get("footer.bin"), 0, Data.MainData.get("footer.bin").length);
 
         byte[] patchedBin = TADPole.rebuildTad(crypto, Data.MainData);
-        Files.write(Paths.get(tmpDirPath, "dsiware.bin.patched"), patchedBin);
+        Files.write(targetfile, patchedBin);
     }
 }
