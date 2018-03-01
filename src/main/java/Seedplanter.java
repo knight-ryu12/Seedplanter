@@ -1,4 +1,6 @@
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -7,7 +9,7 @@ import java.security.InvalidKeyException;
 
 public class Seedplanter {
     private DataHandling Data;
-    private String targetfile;
+    private Path targetfile;
 
     //The constructor will read in all of the files into byte arrays
     Seedplanter(Path DSiWare, Path movableSed, Path injectionZip, Path ctcert) throws IOException {
@@ -20,7 +22,7 @@ public class Seedplanter {
         if (ctcert == null || Files.notExists(ctcert))
             throw new IOException("ctcert.bin not found!");
 
-        targetfile = DSiWare.toFile().getName();
+        targetfile = DSiWare;
 
         Data = new DataHandling(DSiWare, movableSed, injectionZip, ctcert);
     }
@@ -53,15 +55,26 @@ public class Seedplanter {
         Data.exportToFile(Data.MainData.get("footer.bin"), footerPath);
 
         //Sign footer.bin
-        Runtime.getRuntime().exec(
-                tmpDirPath + "/ctr-dsiwaretool.exe " + tmpDirPath + "/footer.bin " + tmpDirPath + "/ctcert.bin " + "--write"
-        );
+        System.out.println("============== EXECUTING CTR-DSIWARETOOL ==============");
+        Process proc = Runtime.getRuntime().exec(tmpDirPath + "/ctr-dsiwaretool.exe " + tmpDirPath + "/footer.bin " + tmpDirPath + "/ctcert.bin " + "--write");
+
+        // read the output from the command
+        System.out.println("============== OUTPUT FROM CTR-DSIWARETOOL ==============");
+        BufferedReader stdInput = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+        BufferedReader stdError = new BufferedReader(new InputStreamReader(proc.getErrorStream()));
+
+        String str;
+        while ((str = stdInput.readLine()) != null)
+            System.out.println(str);
+        // read any errors from the attempted command
+        while ((str = stdError.readLine()) != null)
+            System.out.println(str);
+        System.out.println("============== END OF CTR-DSIWARETOOL ==============");
 
         //Re-import it back
         System.arraycopy(Data.importToByteArray(footerPath), 0, Data.MainData.get("footer.bin"), 0, Data.MainData.get("footer.bin").length);
 
-        Path desktopPath = Paths.get(System.getProperty("user.home") + "/Desktop/" + targetfile);
         byte[] patchedBin = TADPole.rebuildTad(crypto, Data.MainData);
-        Files.write(desktopPath, patchedBin);
+        Files.write(targetfile, patchedBin);
     }
 }

@@ -1,5 +1,3 @@
-import org.apache.commons.codec.binary.Hex;
-
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.security.InvalidAlgorithmParameterException;
@@ -12,7 +10,7 @@ public class TADPole {
 
     private static byte[] getDump(Crypto crypto, byte[] DSiWare, int data_offset, int size) throws InvalidAlgorithmParameterException, InvalidKeyException {
         byte[] key =  crypto.normalKey;
-        byte[] iv = new byte[16];
+        byte[] iv = new byte[0x10];
         byte[] enc = new byte[size];
 
         System.arraycopy(DSiWare, data_offset, enc, 0, size);
@@ -21,15 +19,14 @@ public class TADPole {
         return crypto.decryptMessage(enc, key, iv);
     }
 
-    private static long[] getContentSize(byte[] h){
-        ByteBuffer buffer = ByteBuffer.allocate(0x2C).order(ByteOrder.LITTLE_ENDIAN).put(h, 0x48, 0x2C);
-        long[] content_sizelist = new long[11];
+    private static int[] getContentSize(byte[] header){
+        ByteBuffer buffer = ByteBuffer.allocate(0x2C).order(ByteOrder.LITTLE_ENDIAN).put(header, 0x48, 0x2C);
         buffer.rewind();
-        for(int i =0; i<11; i++) {
-            long c = Integer.toUnsignedLong(buffer.getInt());
-            if(c == 0xB34)
-                c = 0xB40; //Dirtyhaxx
-            content_sizelist[i] = c;
+
+        int[] content_sizelist = new int[11];
+        for (int i = 0; i < content_sizelist.length; i++) {
+            int c = buffer.getInt();
+            content_sizelist[i] = (c == 0xB34) ? 0xB40 : c;
         }
         return content_sizelist;
     }
@@ -39,11 +36,11 @@ public class TADPole {
         hashmap.put("banner.bin", getDump(crypto, dsiware, 0x0, 0x4000));
         hashmap.put("header.bin", getDump(crypto, dsiware, 0x4020, 0xF0));
         hashmap.put("footer.bin", getDump(crypto, dsiware, 0x4130, 0x4E0));
-        long[] contents = getContentSize(hashmap.get("header.bin"));
+        int[] contents = getContentSize(hashmap.get("header.bin"));
         int off = 0x4630;
         for (int i = 0; i < 11; i++) {
             if (contents[i] != 0) {
-                hashmap.put(content_list[i], getDump(crypto, DSiWare, off, (int)contents[i]));
+                hashmap.put(content_list[i], getDump(crypto, DSiWare, off, contents[i]));
                 off += (contents[i] + 0x20);
             }
         }
@@ -53,13 +50,12 @@ public class TADPole {
         MessageDigest md = null; try { md = MessageDigest.getInstance("SHA-256"); } catch (Exception e) {}
 
         int[] sizes = new int[11]; //the 2 are missing because they are constant and we don't need to log them
-        String[] hash = new String[13];
+        byte[][] hash = new byte[13][];
         String[] footer_namelist = new String[13];
         footer_namelist[0] = "banner.bin";
         footer_namelist[1] = "header.bin";
-        for (int i = 2; i < 13; i++) {
-            footer_namelist[i] = content_list[i-2];
-        }
+        System.arraycopy(content_list, 0, footer_namelist, 2, 11);
+
 
         //load up the header array with sizes
         for (int i = 0; i < sizes.length; i++) {
@@ -71,25 +67,21 @@ public class TADPole {
         for (int i = 0; i < hash.length; i++) {
             byte[] curarr = hashmap.get(footer_namelist[i]);
             if (curarr != null)
-                hash[i] = Hex.encodeHexString(md.digest(curarr));
+                hash[i] = md.digest(curarr);
             else
-                hash[i] = "0000000000000000000000000000000000000000000000000000000000000000";
+                hash[i] = new byte[32]; //Arrays are initialized to zero, so by initializing an array here we are essentially filling it with zeroes
         }
 
         //write the sizes in the header
-        for (int i = 0; i < 11; i++) {
+        for (int i = 0; i < sizes.length; i++) {
             ByteBuffer buffer = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN);
             buffer.putInt(0, sizes[i]);
             System.arraycopy(buffer.array(), 0, hashmap.get("header.bin"), (0x48 + i * 0x4), 0x4);
         }
 
         //write the hashes in the footer
-        try {
-            byte[] footerarr = hashmap.get("footer.bin");
-            for (int i = 0; i < 13; i++) {
-                System.arraycopy(Hex.decodeHex(hash[i]), 0, footerarr, (i * 0x20), 0x20);
-            }
-        } catch (Exception e) {} //TODO: Move from strings to byte arrays for the hashes
+        for (int i = 0; i < hash.length; i++)
+            System.arraycopy(hash[i], 0, hashmap.get("footer.bin"), (i * 0x20), 0x20);
     }
 
     public static byte[] rebuildTad(Crypto crypto, HashMap<String, byte[]> hashmap) throws InvalidAlgorithmParameterException, InvalidKeyException {
@@ -97,9 +89,8 @@ public class TADPole {
         full_namelist[0] = "banner.bin";
         full_namelist[1] = "header.bin";
         full_namelist[2] = "footer.bin";
-        for (int i = 3; i < 14; i++) {
-            full_namelist[i] = content_list[i - 3];
-        }
+        System.arraycopy(content_list, 0, full_namelist, 3, 11);
+
         byte[] bm;
         byte[] section;
         byte[] iv = new byte[0x10];
