@@ -1,3 +1,5 @@
+package faith.elguadia.seedplanter;
+
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.security.InvalidAlgorithmParameterException;

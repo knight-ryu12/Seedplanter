@@ -69,3 +69,4 @@ fabric.properties
 
 # Maven out folder
 /target
+/dependency-reduced-pom.xml

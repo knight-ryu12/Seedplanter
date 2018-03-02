@@ -1,3 +1,5 @@
+package faith.elguadia.seedplanter;
+
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
@@ -31,7 +33,7 @@ public class DataHandling {
             }
             else if (ZIPR == ZipHandling.ZipRegion.ZIP_JPN) {
                 MainData.put("app", ZipHandling.ReadAllBytesFromZipEntry(zf, "4swords.app"));
-                MainData.put("jpn_public.sav", IOUtils.toByteArray(getClass().getResourceAsStream("jpn_public.sav")));
+                MainData.put("jpn_public.sav", IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("jpn_public.sav")));
             }
 
             MainData.put("movable.sed", new byte[16]);
@@ -44,9 +46,9 @@ public class DataHandling {
             //===============================================================
             tmpDir = Files.createTempDirectory("Seedplanter");
 
-            Files.copy(getClass().getResourceAsStream("ctr-dsiwaretool.exe"), Paths.get(tmpDir.toString(), "ctr-dsiwaretool.exe"));
-            Files.copy(getClass().getResourceAsStream("libcrypto-1_1-x64__.dll"), Paths.get(tmpDir.toString(), "libcrypto-1_1-x64__.dll"));
-            Files.copy(getClass().getResourceAsStream("zlib1__.dll"), Paths.get(tmpDir.toString(), "zlib1__.dll"));
+            Files.copy(getClass().getClassLoader().getResourceAsStream("ctr-dsiwaretool.exe"), Paths.get(tmpDir.toString(), "ctr-dsiwaretool.exe"));
+            Files.copy(getClass().getClassLoader().getResourceAsStream("libcrypto-1_1-x64__.dll"), Paths.get(tmpDir.toString(), "libcrypto-1_1-x64__.dll"));
+            Files.copy(getClass().getClassLoader().getResourceAsStream("zlib1__.dll"), Paths.get(tmpDir.toString(), "zlib1__.dll"));
 
             Files.copy(ctcert, Paths.get(tmpDir.toString(), "ctcert.bin"));
         }
