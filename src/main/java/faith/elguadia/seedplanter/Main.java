@@ -17,7 +17,6 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         primaryStage.setTitle("Seedplanter");
-        //File f = new File(Objects.requireNonNull(getClass().getClassLoader().getResource("MainGUI.fxml")).toExternalForm());
         primaryStage.setScene(new Scene(FXMLLoader.load(Objects.requireNonNull(getClass().getClassLoader().getResource("MainGUI.fxml"))),400, 300));
         primaryStage.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream("icon.png")));
         primaryStage.setResizable(false);
