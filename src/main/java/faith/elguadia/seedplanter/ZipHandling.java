@@ -1,3 +1,5 @@
+package faith.elguadia.seedplanter;
+
 import java.util.Arrays;
 import java.io.IOException;
 import java.security.MessageDigest;

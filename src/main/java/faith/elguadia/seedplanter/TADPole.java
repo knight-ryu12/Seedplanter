@@ -1,3 +1,5 @@
+package faith.elguadia.seedplanter;
+
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.security.InvalidAlgorithmParameterException;
@@ -7,6 +9,14 @@ import java.util.HashMap;
 
 public class TADPole {
     private static final String[] content_list = {"tmd", "srl.nds", "2.bin", "3.bin", "4.bin", "5.bin", "6.bin", "7.bin", "8.bin", "public.sav", "banner.sav"};
+
+    //Returns true if they are equal, false if they are not equal
+    private static boolean compareArrays(byte[] arr1, int offset1, byte[] arr2, int offset2, int elements) {
+        for (int i = 0; i < elements; i++)
+            if (arr1[offset1 + i] != arr2[offset2 + i])
+                return false;
+        return true;
+    }
 
     private static byte[] getDump(Crypto crypto, byte[] DSiWare, int data_offset, int size) throws InvalidAlgorithmParameterException, InvalidKeyException {
         byte[] key =  crypto.normalKey;
@@ -36,6 +46,16 @@ public class TADPole {
         hashmap.put("banner.bin", getDump(crypto, dsiware, 0x0, 0x4000));
         hashmap.put("header.bin", getDump(crypto, dsiware, 0x4020, 0xF0));
         hashmap.put("footer.bin", getDump(crypto, dsiware, 0x4130, 0x4E0));
+
+        MessageDigest md = null; try { md = MessageDigest.getInstance("SHA-256"); } catch (Exception e) {}
+        byte[] footer = hashmap.get("footer.bin");
+        byte[] banner_calc_hash = md.digest(hashmap.get("banner.bin"));
+        byte[] header_calc_hash = md.digest(hashmap.get("header.bin"));
+
+        //If decryption went bad, then the hashes won't match up
+        if (!compareArrays(footer, 0, banner_calc_hash, 0, 0x20) || !compareArrays(footer, 0x20, header_calc_hash, 0, 0x20))
+            throw new InvalidKeyException("Failed to decrypt! Are you sure you used the correct movable.sed?");
+
         int[] contents = getContentSize(hashmap.get("header.bin"));
         int off = 0x4630;
         for (int i = 0; i < 11; i++) {
@@ -55,7 +75,6 @@ public class TADPole {
         footer_namelist[0] = "banner.bin";
         footer_namelist[1] = "header.bin";
         System.arraycopy(content_list, 0, footer_namelist, 2, 11);
-
 
         //load up the header array with sizes
         for (int i = 0; i < sizes.length; i++) {

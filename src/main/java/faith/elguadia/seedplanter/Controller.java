@@ -1,3 +1,5 @@
+package faith.elguadia.seedplanter;
+
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
@@ -57,8 +59,8 @@ public class Controller {
         try {
             Seedplanter planter = new Seedplanter(Paths.get(TextFields_Strings[0]), Paths.get(TextFields_Strings[1]), Paths.get(TextFields_Strings[2]), Paths.get(TextFields_Strings[3]));
             planter.DoInjection();
-            Main.showAlertBox("Done!", null, "Everything went well! Your DSiWare bin file has been replaced by the injected version", false);
-        } catch (InvalidKeyException | InvalidAlgorithmParameterException | IOException e) {
+            Main.showAlertBox("Done!", null, "Everything went well! Your DSiWare file has been replaced by the injected version", false);
+        } catch (InvalidKeyException | InvalidAlgorithmParameterException | IOException | InterruptedException e) {
             Main.showAlertBox("An exception occurred!", null, e.getMessage(), true);
         }
     }
