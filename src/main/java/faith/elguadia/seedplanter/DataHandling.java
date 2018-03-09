@@ -29,7 +29,7 @@ public class DataHandling {
             }
             else if (ZIPR == ZipHandling.ZipRegion.ZIP_JPN) {
                 MainData.put("app", ZipHandling.ReadAllBytesFromZipEntry(zf, "4swords.app"));
-                MainData.put("jpn_public.sav", IOUtils.toByteArray(getClass().getResourceAsStream("jpn_public.sav")));
+                MainData.put("jpn_public.sav", IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("jpn_public.sav")));
             }
 
             MainData.put("movable.sed", new byte[16]);
