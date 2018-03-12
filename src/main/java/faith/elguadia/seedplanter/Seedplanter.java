@@ -5,11 +5,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 
 public class Seedplanter {
     private DataHandling Data;
     private Path targetfile;
-    private Path ctcertPath;
 
     //The constructor will read in all of the files into byte arrays
     Seedplanter(Path DSiWare, Path movableSed, Path injectionZip, Path ctcert) throws IOException {
@@ -23,14 +24,13 @@ public class Seedplanter {
             throw new IOException("ctcert.bin not found!");
 
         targetfile = DSiWare;
-        ctcertPath = ctcert;
 
-        Data = new DataHandling(DSiWare, movableSed, injectionZip);
+        Data = new DataHandling(DSiWare, movableSed, injectionZip, ctcert);
     }
 
-    public void DoInjection() throws IOException, InvalidKeyException, InvalidAlgorithmParameterException, InterruptedException {
+    public void DoInjection() throws IOException, InvalidKeyException, InvalidAlgorithmParameterException, NoSuchAlgorithmException, InvalidKeySpecException {
         //This constructor calculates normal key
-        Crypto crypto = new Crypto(Data.MainData.get("movable.sed"));
+        Crypto crypto = new Crypto(Data.MainData.get("key_y"));
         //Decrypt - everything will be put in the main hashmap with its own entries
         TADPole.decrypt(crypto, Data.MainData.get("dsiware.bin"), Data.MainData);
 
@@ -50,12 +50,8 @@ public class Seedplanter {
         //Fix footer/header
         TADPole.fixHash(Data.MainData);
 
-        //Export footer.bin
-        Signing signer = new Signing();
-        signer.ExportFiles(Data.MainData.get("footer.bin"), ctcertPath);
+        Signing signer = new Signing(Data.MainData.get("ctcert.bin"), Data.MainData.get("footer.bin"));
         signer.DoSigning();
-        byte[] signed_footer = signer.ImportFooter();
-        System.arraycopy(signed_footer, 0, Data.MainData.get("footer.bin"), 0, Data.MainData.get("footer.bin").length);
 
         byte[] patchedBin = TADPole.rebuildTad(crypto, Data.MainData);
         Files.write(targetfile, patchedBin);

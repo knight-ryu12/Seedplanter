@@ -14,7 +14,7 @@ public class DataHandling {
 
     public ZipHandling.ZipRegion getZipRegion()    { return ZIPR; }
 
-    DataHandling(Path DSiWare, Path movableSed, Path injectionZip) throws IOException {
+    DataHandling(Path DSiWare, Path movableSed, Path injectionZip, Path ctcert) throws IOException {
         try (ZipFile zf = new ZipFile(injectionZip.toFile())) {
             //===============================================================
             //========Read in DSiWare, movable.sed, and ZIP entries==========
@@ -31,11 +31,10 @@ public class DataHandling {
                 MainData.put("app", ZipHandling.ReadAllBytesFromZipEntry(zf, "4swords.app"));
                 MainData.put("jpn_public.sav", IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("jpn_public.sav")));
             }
-
-            MainData.put("movable.sed", new byte[16]);
-            System.arraycopy(Files.readAllBytes(movableSed), 0x110, MainData.get("movable.sed"), 0, 0x10);
-
-            MainData.put("dsiware.bin", Files.readAllBytes(DSiWare));
         }
+        MainData.put("key_y", new byte[16]);
+        System.arraycopy(Files.readAllBytes(movableSed), 0x110, MainData.get("key_y"), 0, 0x10);
+        MainData.put("dsiware.bin", Files.readAllBytes(DSiWare));
+        MainData.put("ctcert.bin", Files.readAllBytes(ctcert));
     }
 }
