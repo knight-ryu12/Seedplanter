@@ -6,7 +6,7 @@ import java.nio.file.Path;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
+import java.security.SignatureException;
 
 public class Seedplanter {
     private DataHandling Data;
@@ -28,7 +28,7 @@ public class Seedplanter {
         Data = new DataHandling(DSiWare, movableSed, injectionZip, ctcert);
     }
 
-    public void DoInjection() throws IOException, InvalidKeyException, InvalidAlgorithmParameterException, NoSuchAlgorithmException, InvalidKeySpecException {
+    public void DoInjection() throws IOException, InvalidKeyException, InvalidAlgorithmParameterException, NoSuchAlgorithmException, SignatureException {
         //This constructor calculates normal key
         Crypto crypto = new Crypto(Data.MainData.get("key_y"));
         //Decrypt - everything will be put in the main hashmap with its own entries
@@ -51,7 +51,7 @@ public class Seedplanter {
         TADPole.fixHash(Data.MainData);
 
         Signing signer = new Signing(Data.MainData.get("ctcert.bin"), Data.MainData.get("footer.bin"));
-        signer.DoSigning();
+        signer.DoSign();
 
         byte[] patchedBin = TADPole.rebuildTad(crypto, Data.MainData);
         Files.write(targetfile, patchedBin);

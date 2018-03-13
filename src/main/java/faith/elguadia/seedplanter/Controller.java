@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
+import java.security.SignatureException;
 
 public class Controller {
     @FXML private TextField dsiWare_TextField, movableSed_TextField, injectionZip_TextField, ctcert_TextField;
@@ -62,7 +62,7 @@ public class Controller {
             Seedplanter planter = new Seedplanter(Paths.get(TextFields_Strings[0]), Paths.get(TextFields_Strings[1]), Paths.get(TextFields_Strings[2]), Paths.get(TextFields_Strings[3]));
             planter.DoInjection();
             Main.showAlertBox("Done!", null, "Everything went well! Your DSiWare file has been replaced by the injected version", false);
-        } catch (InvalidKeyException | NoSuchAlgorithmException | InvalidKeySpecException | InvalidAlgorithmParameterException | IOException e) {
+        } catch (InvalidKeyException | NoSuchAlgorithmException | SignatureException | InvalidAlgorithmParameterException | IOException e) {
             Main.showAlertBox("An exception occurred!", null, e.getMessage(), true);
         }
     }
