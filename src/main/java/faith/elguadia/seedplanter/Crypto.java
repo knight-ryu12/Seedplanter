@@ -14,7 +14,7 @@ import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
 
-public class Crypto {
+class Crypto {
     private final BigInteger keyx = new BigInteger("6FBB01F872CAF9C01834EEC04065EE53", 16);
     private final BigInteger F128 = new BigInteger("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF", 16);
     private final BigInteger C    = new BigInteger("1FF9E9AAC5FE0408024591DC5D52768A", 16);

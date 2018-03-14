@@ -8,7 +8,7 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.zip.ZipFile;
 
-public class DataHandling {
+class DataHandling {
     private ZipHandling.ZipRegion ZIPR;
     public HashMap<String, byte[]> MainData = new HashMap<>();
 
@@ -32,9 +32,17 @@ public class DataHandling {
                 MainData.put("jpn_public.sav", IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("jpn_public.sav")));
             }
         }
+        byte[] movablesed = Files.readAllBytes(movableSed);
+        if (movablesed.length != 0x140) {
+            throw new IOException("movable.sed is not 320 bytes in size!");
+        }
+
         MainData.put("key_y", new byte[16]);
-        System.arraycopy(Files.readAllBytes(movableSed), 0x110, MainData.get("key_y"), 0, 0x10);
+        System.arraycopy(movablesed, 0x110, MainData.get("key_y"), 0, 0x10);
         MainData.put("dsiware.bin", Files.readAllBytes(DSiWare));
         MainData.put("ctcert.bin", Files.readAllBytes(ctcert));
+        if (MainData.get("ctcert.bin").length != (0x180 + 0x1E)) {
+            throw new IOException("Invalid ctcert.bin! The filesize is not 414 bytes exactly!");
+        }
     }
 }

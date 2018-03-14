@@ -7,7 +7,7 @@ import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.util.HashMap;
 
-public class TADPole {
+class TADPole {
     private static final String[] content_list = {"tmd", "srl.nds", "2.bin", "3.bin", "4.bin", "5.bin", "6.bin", "7.bin", "8.bin", "public.sav", "banner.sav"};
 
     //Returns true if they are equal, false if they are not equal

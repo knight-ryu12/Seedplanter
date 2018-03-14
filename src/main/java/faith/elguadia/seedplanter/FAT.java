@@ -29,7 +29,7 @@ class FATC {
     static int DataStartSector;
 }
 
-public class FAT {
+class FAT {
     private byte[] FatIMG;
 
     FAT(byte[] image) {
@@ -100,7 +100,7 @@ public class FAT {
         //We need to make an entry in the root
 
         //The first thing is to put the filename and the file attributes (in our case we only put the ARCHIVE attribute)
-        byte[] filename_bytes = null; try { filename_bytes = filename.getBytes("US-ASCII"); } catch (Exception e) {} //These pointless exceptions...
+        byte[] filename_bytes = filename.getBytes();
         System.arraycopy(filename_bytes, 0, FatIMG, RootStartAddr, 11);
         FatIMG[RootStartAddr + 11] = 0x20;
 
@@ -128,8 +128,9 @@ public class FAT {
 
     //copy the first FAT table into the second FAT table
     public void copyFATable() {
-        int RootStartAddr = FATC.RootStartSector * FATC.BPB_BytsPerSec;
+        int FAT1StartAddr = FATC.FATableStartSector * FATC.BPB_BytsPerSec;
         int FATSzBytes = FATC.BPB_FATSz16 * FATC.BPB_BytsPerSec;
-        System.arraycopy(FatIMG, RootStartAddr, FatIMG, (RootStartAddr + FATSzBytes), FATSzBytes);
+        int FAT2StardAddr = FAT1StartAddr + FATSzBytes;
+        System.arraycopy(FatIMG, FAT1StartAddr, FatIMG, FAT2StardAddr, FATSzBytes);
     }
 }

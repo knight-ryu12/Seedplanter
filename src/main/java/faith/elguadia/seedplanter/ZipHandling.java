@@ -6,7 +6,7 @@ import java.security.MessageDigest;
 import java.util.zip.ZipFile;
 import org.apache.commons.io.IOUtils;
 
-public class ZipHandling {
+class ZipHandling {
     public enum ZipRegion {ZIP_EUR, ZIP_USA, ZIP_JPN, ZIP_ERROR}
 
     //The (byte)s everywhere don't look good I know, but that's what you get for having java use only signed integers...

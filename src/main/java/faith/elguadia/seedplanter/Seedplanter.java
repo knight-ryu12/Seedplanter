@@ -8,7 +8,7 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SignatureException;
 
-public class Seedplanter {
+class Seedplanter {
     private DataHandling Data;
     private Path targetfile;
 
