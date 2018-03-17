@@ -90,7 +90,7 @@ class Signing {
         System.arraycopy(ctcert_bin, 0,     footer, totalhashsize + 0x1BC, 0x180);
 
         //Copy the public key from the CTCert to the correct spot for the APCert
-        System.arraycopy(ctcert_bin, 0x108, footer, totalhashsize + 0x3C + 4, 0x3C);
+        System.arraycopy(ctcert_bin, 0x108, footer, totalhashsize + 0x3C + 0x108, 0x3C);
 
         //Sign the hashes at the top, and place the signature in the right spot of the footer
         ecdsaSign.update(hashes);
